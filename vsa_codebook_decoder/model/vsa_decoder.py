@@ -44,10 +44,11 @@ class VSADecoder(pl.LightningModule):
                                  latent_dim=cfg.model.latent_dim,
                                  seed=cfg.experiment.seed)
 
+        self.layer_norms = nn.ModuleList([nn.LayerNorm(cfg.model.latent_dim)])
         self.q_proj = nn.ModuleList([nn.Linear(cfg.model.latent_dim, cfg.model.latent_dim) for _ in
                                      range(cfg.dataset.n_features)])
 
-        self.scale = 1 / (cfg.model.latent_dim) ** 0.5
+        self.scale = 1 # / (cfg.model.latent_dim) ** 0.5
         self.softmax = nn.Softmax(dim=1)
 
         if cfg.model.binder == 'fourier':
@@ -76,7 +77,6 @@ class VSADecoder(pl.LightningModule):
 
         return sum(values), max_values
 
-
     def step(self, batch, batch_idx, mode: str = 'Train') -> torch.tensor:
         # Logging period
         # Log Train samples once per epoch
@@ -103,7 +103,8 @@ class VSADecoder(pl.LightningModule):
         self.log(f"{mode}/MSE Loss", loss)
         self.log(f"{mode}/IOU", iou)
         self.logger.experiment.log(
-            {"Max/" + Dsprites.feature_names[i]: max_values[i] for i in range(self.cfg.dataset.n_features)})
+            {"Max/" + Dsprites.feature_names[i]: max_values[i] for i in
+             range(self.cfg.dataset.n_features)})
 
         if log_images(batch_idx):
             self.logger.experiment.log({
