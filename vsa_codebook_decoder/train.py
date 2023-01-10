@@ -57,8 +57,8 @@ def main(cfg: VSADecoderConfig) -> None:
     lr_monitor = LearningRateMonitor(logging_interval='step')
 
     callbacks = [
-        top_metric_callback,
-        every_epoch_callback,
+        # top_metric_callback,
+        # every_epoch_callback,
         lr_monitor,
     ]
 
@@ -68,8 +68,7 @@ def main(cfg: VSADecoderConfig) -> None:
              f'-s {cfg.experiment.seed} '
              f'-bs {cfg.experiment.batch_size} '
              f'vsa',
-        save_dir=cfg.experiment.logging_dir,
-        log_model='all')
+        save_dir=cfg.experiment.logging_dir)
 
     wandb_logger.watch(model)
 

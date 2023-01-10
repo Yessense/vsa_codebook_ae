@@ -60,7 +60,8 @@ class VSADecoder(pl.LightningModule):
     def attention(self, x):
         query: List[torch.tensor] = [self.q_proj[i](x) for i in range(self.cfg.dataset.n_features)]
 
-        features: List[torch.tensor] = self.codebook.vsa_features
+        features: List[torch.tensor] = [feature.to(self.device) for feature in
+                                        self.codebook.vsa_features]
 
         k: torch.tensor
         attn_logits = [torch.matmul(query[i], key.transpose(-2, -1)) for i, key in
@@ -71,7 +72,7 @@ class VSADecoder(pl.LightningModule):
         values = [torch.matmul(attention[i], features[i]) for i in
                   range(self.cfg.dataset.n_features)]
 
-        return values
+        return sum(values)
 
     def encode(self, x):
         x = self.encoder(x)

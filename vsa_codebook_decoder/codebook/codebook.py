@@ -43,6 +43,7 @@ class Codebook:
                  seed: int = 0,
                  device: torch.device = torch.device('cpu')):
         torch.manual_seed(seed)
+        self.device = device
         self.features = features
         self.n_features = len(features)
         # Add placeholders Feature class to automatic creation later
