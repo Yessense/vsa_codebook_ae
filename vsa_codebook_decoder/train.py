@@ -57,8 +57,8 @@ def main(cfg: VSADecoderConfig) -> None:
     lr_monitor = LearningRateMonitor(logging_interval='step')
 
     callbacks = [
-        # top_metric_callback,
-        # every_epoch_callback,
+        top_metric_callback,
+        every_epoch_callback,
         lr_monitor,
     ]
 
