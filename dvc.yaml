@@ -1,0 +1,12 @@
+stages:
+  prepare_data:
+    cmd: bash prepare_data.sh
+    deps:
+    - ./vsa_codebook_decoder/dataset/paired_dsprites.py
+    - prepare_data.sh
+    outs:
+    - data/
+  train:
+    cmd: python3 -m vsa_codebook_decoder.train
+    deps:
+    - conf/config.yaml
