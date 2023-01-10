@@ -1,0 +1,16 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: bash prepare_data.sh
+    deps:
+    - path: ./vsa_codebook_decoder/dataset/paired_dsprites.py
+      md5: 2ff4def614a2c321fa947170b14d63e9
+      size: 10245
+    - path: prepare_data.sh
+      md5: e10c2bce7006936457bf74bb491cda89
+      size: 450
+    outs:
+    - path: data/
+      md5: ac8e3188c7af87a29ed508e631ed0bdd.dir
+      size: 19318135
+      nfiles: 1
