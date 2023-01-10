@@ -69,15 +69,17 @@ class VSADecoder(pl.LightningModule):
         attn_logits = [logit * self.scale for logit in attn_logits]
         attention = [self.softmax(logit) for logit in attn_logits]
 
+        max_values = [torch.mean(torch.max(attn, dim=1).values) for attn in attention]
+
         values = [torch.matmul(attention[i], features[i]) for i in
                   range(self.cfg.dataset.n_features)]
 
-        return sum(values)
+        return sum(values), max_values
 
     def encode(self, x):
-        x = self.encoder(x)
+        x, max_values = self.encoder(x)
         x = self.attention(x)
-        return x
+        return x, max_values
 
     def step(self, batch, batch_idx, mode: str = 'Train') -> torch.tensor:
         # Logging period
@@ -95,7 +97,7 @@ class VSADecoder(pl.LightningModule):
 
         image, labels = batch
 
-        z = self.encode(image)
+        z, max_values = self.encode(image)
         decoded_image = self.decoder(z)
 
         loss = F.mse_loss(decoded_image, image)
@@ -103,6 +105,8 @@ class VSADecoder(pl.LightningModule):
 
         self.log(f"{mode}/MSE Loss", loss)
         self.log(f"{mode}/IOU", iou)
+        self.logger.experiment.log(
+            {Dsprites.feature_names[i]: max_values[i] for i in range(self.cfg.dataset.n_features)})
 
         if log_images(batch_idx):
             self.logger.experiment.log({
