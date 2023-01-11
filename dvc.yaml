@@ -1,9 +1,8 @@
 stages:
   prepare_data:
-    cmd: bash prepare_data.sh
+    cmd: bash prepare_dsprites.sh
     deps:
-    - ./vsa_codebook_decoder/dataset/paired_dsprites.py
-    - prepare_data.sh
+    - prepare_dsprites.sh
     outs:
     - data/
   train:

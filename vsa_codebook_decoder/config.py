@@ -6,7 +6,7 @@ from vsa_codebook_decoder.dataset.paired_dsprites import Dsprites
 @dataclass
 class DatasetConfig:
     mode: str = "dsprites"
-    path_to_dataset: str = "${hydra:runtime.cwd}/data/paired_dsprites/"
+    path_to_dataset: str = "${hydra:runtime.cwd}/data/dsprites/"
     train_size: int = 100_000
     val_size: int = 30_000
     n_features: int = 5
