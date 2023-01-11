@@ -10,3 +10,4 @@ stages:
     cmd: python3 -m vsa_codebook_decoder.train
     deps:
     - conf/config.yaml
+    - vsa_codebook_decoder/model/
