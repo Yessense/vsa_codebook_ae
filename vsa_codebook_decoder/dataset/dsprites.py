@@ -41,7 +41,7 @@ class Dsprites(DatasetWithInfo):
 
     image_size: Tuple[int, int, int] = (1, 64, 64)
 
-    def __init__(self, path='data/paired_dsprites/dsprites_train.npz'):
+    def __init__(self, path='data/dsprites/dsprites.npz'):
         # Load npz numpy archive
         dataset_zip = np.load(path, allow_pickle=True, encoding='latin1')
 
@@ -95,7 +95,7 @@ class DspritesDatamodule(pl.LightningDataModule):
                  val_size: int = 30_000):
         super().__init__()
         self.path_to_data_dir = Path(path_to_data_dir)
-        self.path_to_dsprites_dataset = str(self.path_to_data_dir / 'dsprites_train.npz')
+        self.path_to_dsprites_dataset = str(self.path_to_data_dir / 'dsprites.npz')
         self.batch_size = batch_size
         self.train_size, self.val_size = train_size, val_size
 
