@@ -48,7 +48,12 @@ class VSADecoder(pl.LightningModule):
         self.q_proj = nn.ModuleList([nn.Linear(cfg.model.latent_dim, cfg.model.latent_dim) for _ in
                                      range(cfg.dataset.n_features)])
 
-        self.scale = 1  # / (cfg.model.latent_dim) ** 0.5
+        if self.cfg.experiment.scale == 'sqrt':
+            self.scale = (cfg.model.latent_dim) ** 0.5
+        elif self.cfg.experiment.scale == 'none':
+            self.scale = 1
+        else:
+            raise NotImplemented(f"Wrong scale parameter {cfg.experiment.scale}")
         self.softmax = nn.Softmax(dim=1)
 
         if cfg.model.binder == 'fourier':

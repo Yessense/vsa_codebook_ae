@@ -46,6 +46,7 @@ class ExperimentConfig:
     profiler: Optional[str] = None
     gradient_clip: float = 0.0
     logging_dir: str = "${hydra:run.dir}/"
+    scale: str = 'sqrt'
 
 
 @dataclass
