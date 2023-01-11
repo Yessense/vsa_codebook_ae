@@ -2,6 +2,7 @@ stages:
   prepare_data:
     cmd: bash prepare_dsprites.sh
     deps:
+    - ./vsa_codebook_decoder/dataset/dsprites.py
     - prepare_dsprites.sh
     outs:
     - data/
@@ -10,3 +11,4 @@ stages:
     deps:
     - conf/config.yaml
     - vsa_codebook_decoder/model/
+
