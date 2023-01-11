@@ -48,7 +48,7 @@ class VSADecoder(pl.LightningModule):
         self.q_proj = nn.ModuleList([nn.Linear(cfg.model.latent_dim, cfg.model.latent_dim) for _ in
                                      range(cfg.dataset.n_features)])
 
-        self.scale = 1 # / (cfg.model.latent_dim) ** 0.5
+        self.scale = 1  # / (cfg.model.latent_dim) ** 0.5
         self.softmax = nn.Softmax(dim=1)
 
         if cfg.model.binder == 'fourier':
@@ -75,7 +75,10 @@ class VSADecoder(pl.LightningModule):
         values = [torch.matmul(attention[i], features[i]) for i in
                   range(self.cfg.dataset.n_features)]
 
-        return sum(values), max_values
+        values = torch.stack(values, dim=1)
+        values = self.binder(values)
+
+        return torch.sum(values, dim=1), max_values
 
     def step(self, batch, batch_idx, mode: str = 'Train') -> torch.tensor:
         # Logging period
