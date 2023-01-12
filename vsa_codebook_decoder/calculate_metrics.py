@@ -26,6 +26,7 @@ path_to_dataset = pathlib.Path().absolute()
 def main(cfg: VSADecoderConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
     seed_everything(cfg.experiment.seed)
+    cfg.metrics.metrics_dir = "outputs/2023-01-12/19-02-51/"
 
     if cfg.dataset.mode == 'dsprites':
         datamodule = DspritesDatamodule(
@@ -39,59 +40,36 @@ def main(cfg: VSADecoderConfig) -> None:
             batch_size=cfg.experiment.batch_size,
             train_size=cfg.dataset.train_size,
             val_size=cfg.dataset.val_size)
-
     else:
         raise NotImplemented(f"Wrong dataset mode {cfg.dataset.path_to_dataset!r}")
 
-    cfg.experiment.steps_per_epoch = cfg.dataset.train_size // cfg.experiment.batch_size
+    if not cfg.metrics.ckpt_path:
+        cfg.metrics.ckpt_path = find_best_model(
+            os.path.join(cfg.metrics.metrics_dir, "checkpoints"))
 
-    model = VSADecoder(cfg=cfg)
+    print(cfg.metrics.ckpt_path)
 
-    checkpoints_path = os.path.join(cfg.experiment.logging_dir, "checkpoints")
-
-    top_metric_callback = ModelCheckpoint(monitor=cfg.model.monitor,
-                                          dirpath=checkpoints_path,
-                                          filename='best-{epoch}',
-                                          save_top_k=cfg.checkpoint.save_top_k)
-    every_epoch_callback = ModelCheckpoint(every_n_epochs=cfg.checkpoint.every_k_epochs,
-                                           filename='last-{epoch}',
-                                           dirpath=checkpoints_path)
-
-    # Learning rate monitor
-    lr_monitor = LearningRateMonitor(logging_interval='step')
-
-    callbacks = [
-        top_metric_callback,
-        every_epoch_callback,
-        lr_monitor,
-    ]
+    model = VSADecoder.load_from_checkpoint(cfg.metrics.ckpt_path)
 
     wandb_logger = WandbLogger(
-        project=cfg.dataset.mode + '_vsa',
+        project=f"metrics_{cfg.dataset.mode}_vsa",
         name=f'{cfg.dataset.mode} -l {cfg.model.latent_dim} '
              f'-s {cfg.experiment.seed} '
              f'-bs {cfg.experiment.batch_size} '
              f'vsa',
         save_dir=cfg.experiment.logging_dir)
 
-    os.environ['WANDB_CACHE_DIR'] = os.path.join(cfg.experiment.logging_dir, 'cache')
-    wandb_logger.watch(model)
-
     # trainer
     trainer = pl.Trainer(accelerator=cfg.experiment.accelerator,
                          devices=cfg.experiment.devices,
-                         max_epochs=cfg.experiment.max_epochs,
                          profiler=cfg.experiment.profiler,
-                         callbacks=callbacks,
                          logger=wandb_logger,
-                         check_val_every_n_epoch=cfg.checkpoint.check_val_every_n_epochs,
-                         gradient_clip_val=cfg.experiment.gradient_clip)
-    # Train
-    trainer.fit(model,
-                datamodule=datamodule,
-                ckpt_path=cfg.checkpoint.ckpt_path)
+                         )
 
-    print(f"Trained. Logging dir: {cfg.experiment.logging_dir}")
+    trainer.test(model,
+                 datamodule=datamodule,
+                 ckpt_path=cfg.checkpoint.ckpt_path)
+
 
 if __name__ == '__main__':
     main()

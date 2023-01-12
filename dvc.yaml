@@ -11,6 +11,7 @@ stages:
     deps:
       - conf/config.yaml
       - vsa_codebook_decoder/model/
+      - vsa_codebook_decoder/train.py
 #  calculate_metrics:
 #    cmd: python3 -m vsa_codebook_decoder.calculate_metrics
 #    deps:

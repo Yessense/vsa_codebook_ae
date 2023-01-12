@@ -154,7 +154,7 @@ class VSADecoder(pl.LightningModule):
 
         z = self.encoder(image)
         latent_features, max_values = self.attention(z)
-        latent_vectors = torch.sum(z, dim=1)
+        latent_vectors = torch.sum(latent_features, dim=1)
 
         return latent_vectors, latent_features, labels
 

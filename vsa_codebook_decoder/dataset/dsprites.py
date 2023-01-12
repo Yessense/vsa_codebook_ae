@@ -112,3 +112,6 @@ class DspritesDatamodule(pl.LightningDataModule):
 
     def val_dataloader(self) -> EVAL_DATALOADERS:
         return DataLoader(self.dsprites_val, batch_size=self.batch_size, drop_last=True)
+
+    def test_dataloader(self) -> EVAL_DATALOADERS:
+        return self.val_dataloader()
