@@ -90,6 +90,9 @@ def main(cfg: VSADecoderConfig) -> None:
                 datamodule=datamodule,
                 ckpt_path=cfg.checkpoint.ckpt_path)
 
+    trainer.test(model,
+                 datamodule=datamodule,
+                 ckpt_path=cfg.checkpoint.ckpt_path)
 
 if __name__ == '__main__':
     main()
