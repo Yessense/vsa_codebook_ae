@@ -12,7 +12,7 @@ stages:
       - conf/config.yaml
       - vsa_codebook_decoder/model/
   calculate_metrics:
-    cmd: python3 -m vsa_codevook_deocder.calcualte_metrics
+    cmd: python3 -m vsa_codebook_decoder.calcualte_metrics
     deps:
       - vsa_codebook_decoder/calculate_metrics.py
 
