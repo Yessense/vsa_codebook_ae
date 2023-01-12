@@ -20,6 +20,7 @@ cs.store(name="config", node=VSADecoderConfig)
 
 path_to_dataset = pathlib.Path().absolute()
 
+
 @hydra.main(version_base=None, config_path="../conf", config_name="config")
 def main(cfg: VSADecoderConfig) -> None:
     print(OmegaConf.to_yaml(cfg))
@@ -49,9 +50,10 @@ def main(cfg: VSADecoderConfig) -> None:
 
     top_metric_callback = ModelCheckpoint(monitor=cfg.model.monitor,
                                           dirpath=checkpoints_path,
-                                          filename='best-epoch={epoch}',
+                                          filename='best-{epoch}',
                                           save_top_k=cfg.checkpoint.save_top_k)
     every_epoch_callback = ModelCheckpoint(every_n_epochs=cfg.checkpoint.every_k_epochs,
+                                           filename='last-{epoch}',
                                            dirpath=checkpoints_path)
 
     # Learning rate monitor
@@ -70,7 +72,6 @@ def main(cfg: VSADecoderConfig) -> None:
              f'-bs {cfg.experiment.batch_size} '
              f'vsa',
         save_dir=cfg.experiment.logging_dir)
-
 
     wandb_logger.watch(model)
 
