@@ -73,6 +73,7 @@ def main(cfg: VSADecoderConfig) -> None:
              f'vsa',
         save_dir=cfg.experiment.logging_dir)
 
+    os.environ['WANDB_CACHE_DIR'] = os.path.join(cfg.experiment.logging_dir, 'cache')
     wandb_logger.watch(model)
 
     # trainer
