@@ -13,6 +13,7 @@ import torch.nn.functional as F
 from torch import nn
 from torch.optim import lr_scheduler
 
+from ..metrics.vsa import vsa_decoding_accuracy
 from ..utils import iou_pytorch
 from ..dataset.paired_dsprites import Dsprites
 from ..codebook.codebook import Codebook
@@ -83,7 +84,7 @@ class VSADecoder(pl.LightningModule):
         values = torch.stack(values, dim=1)
         values = self.binder(values)
 
-        return torch.sum(values, dim=1), max_values
+        return values, max_values
 
     def step(self, batch, batch_idx, mode: str = 'Train') -> torch.tensor:
         # Logging period
@@ -103,6 +104,7 @@ class VSADecoder(pl.LightningModule):
 
         z = self.encoder(image)
         z, max_values = self.attention(z)
+        z = torch.sum(z, dim=1)
         decoded_image = self.decoder(z)
 
         loss = F.mse_loss(decoded_image, image)
@@ -141,6 +143,43 @@ class VSADecoder(pl.LightningModule):
                 "lr_scheduler": {'scheduler': scheduler,
                                  'interval': 'step',
                                  'frequency': 1}, }
+
+    def on_test_start(self) -> None:
+        self.latent_vectors = []
+        self.latent_features = []
+        self.labels = []
+
+    def test_step(self, batch, batch_idx):
+        image, labels = batch
+
+        z = self.encoder(image)
+        latent_features, max_values = self.attention(z)
+        latent_vectors = torch.sum(z, dim=1)
+
+        return latent_vectors, latent_features, labels
+
+    def on_test_batch_end(self,
+                          outputs: Optional[STEP_OUTPUT],
+                          batch: Any,
+                          batch_idx: int,
+                          dataloader_idx: int) -> None:
+        latent_vectors, latent_features, labels = outputs
+
+        self.latent_vectors.append(latent_vectors)
+        self.latent_features.append(latent_features)
+        self.labels.append(labels)
+
+    def on_test_end(self) -> None:
+        self.latent_vectors = torch.cat(self.latent_vectors)
+        self.latent_features = torch.cat(self.latent_features)
+        self.labels = torch.cat(self.labels)
+
+        vsa_accuracy = vsa_decoding_accuracy(placeholders=self.binder.hd_placeholders.squeeze(0),
+                                             codebook=self.codebook.vsa_features,
+                                             latent_vectors=self.latent_vectors,
+                                             labels=self.labels,
+                                             device=self.device)
+        self.logger.experiment.log(vsa_accuracy)
 
 
 cs = ConfigStore.instance()

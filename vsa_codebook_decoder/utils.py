@@ -1,6 +1,21 @@
+import os
+
 import torch
 from functools import reduce
 import operator
+
+
+def find_best_model(ckpt_dir):
+    if not os.path.exists(ckpt_dir) or not os.path.isdir(ckpt_dir):
+        raise FileExistsError(f"This directory is not exists: {ckpt_dir}")
+
+    ckpt_files = os.listdir(ckpt_dir)
+    for filename in ckpt_files:
+        if filename.startswith("best"):
+            return os.path.join(ckpt_dir, filename)
+    else:
+        raise FileExistsError(f"Best model is not exists in dir: {ckpt_dir}")
+
 
 def iou_pytorch(outputs: torch.Tensor, labels: torch.Tensor):
     # You can comment out this line if you are passing tensors of equal shape
@@ -15,13 +30,15 @@ def iou_pytorch(outputs: torch.Tensor, labels: torch.Tensor):
 
     iou = (intersection + SMOOTH) / (union + SMOOTH)  # We smooth our devision to avoid 0/0
 
-    thresholded = torch.clamp(20 * (iou - 0.5), 0, 10).ceil() / 10  # This is equal to comparing with thresolds
+    thresholded = torch.clamp(20 * (iou - 0.5), 0,
+                              10).ceil() / 10  # This is equal to comparing with thresolds
 
     return thresholded.mean()
+
 
 def product(arr):
     return reduce(operator.mul, arr)
 
 
 if __name__ == '__main__':
-    print(product([3,4,5]))
+    print(product([3, 4, 5]))
