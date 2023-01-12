@@ -10,6 +10,7 @@ from pytorch_lightning import seed_everything
 from pytorch_lightning.callbacks import ModelCheckpoint, LearningRateMonitor
 from pytorch_lightning.loggers import WandbLogger
 
+from .utils import find_best_model
 from .dataset.generalization_dsprites import GeneralizationDspritesDataModule
 from .dataset.dsprites import DspritesDatamodule
 from .model.vsa_decoder import VSADecoder
@@ -85,14 +86,19 @@ def main(cfg: VSADecoderConfig) -> None:
                          logger=wandb_logger,
                          check_val_every_n_epoch=cfg.checkpoint.check_val_every_n_epochs,
                          gradient_clip_val=cfg.experiment.gradient_clip)
-
+    # Train
     trainer.fit(model,
                 datamodule=datamodule,
                 ckpt_path=cfg.checkpoint.ckpt_path)
 
+
+    ckpt_path = find_best_model(
+        os.path.join(cfg.metrics.metrics_dir, "checkpoints"))
+    model = VSADecoder.load_from_checkpoint(ckpt_path)
     trainer.test(model,
                  datamodule=datamodule,
                  ckpt_path=cfg.checkpoint.ckpt_path)
+
 
 if __name__ == '__main__':
     main()
