@@ -91,9 +91,8 @@ def main(cfg: VSADecoderConfig) -> None:
                 datamodule=datamodule,
                 ckpt_path=cfg.checkpoint.ckpt_path)
 
-
     ckpt_path = find_best_model(
-        os.path.join(cfg.metrics.metrics_dir, "checkpoints"))
+        os.path.join(cfg.experiment.logging_dir, "checkpoints"))
     model = VSADecoder.load_from_checkpoint(ckpt_path)
     trainer.test(model,
                  datamodule=datamodule,
