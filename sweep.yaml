@@ -1,0 +1,14 @@
+program: vsa_codebook_decoder.train
+method: grid
+metric:
+  goal: maximize
+  name: "Validation/MSE Loss"
+parameters:
+  experiment.scale:
+    values: [ 0.01, 0.05, 0.1, 0.2, 0.5, 1, 2, 10 ]
+
+command:
+  - python
+  - -m
+  - ${program}
+  - ${args_no_hyphens}

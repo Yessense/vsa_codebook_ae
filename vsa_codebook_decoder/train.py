@@ -1,5 +1,7 @@
 import os
 import pathlib
+import sys
+sys.path.append("..")
 
 import hydra
 import wandb
