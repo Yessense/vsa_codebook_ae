@@ -1,0 +1,29 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: bash prepare_dsprites.sh
+    deps:
+    - path: ./vsa_codebook_decoder/dataset/dsprites.py
+      md5: d31313d85ea53b8fba47668cac06f351
+      size: 3846
+    - path: prepare_dsprites.sh
+      md5: 849dcedaf203079ee949e3105c58e58e
+      size: 177
+    outs:
+    - path: data/
+      md5: 8177300675b196f3631c009805548ac3.dir
+      size: 19318135
+      nfiles: 1
+  train:
+    cmd: python3 -m vsa_codebook_decoder.train
+    deps:
+    - path: conf/config.yaml
+      md5: 465dc35647824c685c71fe3c010af6d7
+      size: 29
+    - path: vsa_codebook_decoder/model/
+      md5: bc2f002293ab8f2ed97f9294de813aa1.dir
+      size: 26217
+      nfiles: 10
+    - path: vsa_codebook_decoder/train.py
+      md5: 22df343154d419d3fa1ed038b44da94e
+      size: 3678
