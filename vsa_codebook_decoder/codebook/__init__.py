@@ -1,1 +1,2 @@
-from .codebook import Codebook, Feature, vsa
+from .codebook import Codebook, Feature
+from .vsa import *

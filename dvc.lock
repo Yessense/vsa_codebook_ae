@@ -21,8 +21,8 @@ stages:
       md5: 465dc35647824c685c71fe3c010af6d7
       size: 29
     - path: vsa_codebook_decoder/model/
-      md5: bc2f002293ab8f2ed97f9294de813aa1.dir
-      size: 26217
+      md5: 94df11af9a62c0fa2947e89eec9d59f0.dir
+      size: 26167
       nfiles: 10
     - path: vsa_codebook_decoder/train.py
       md5: 22df343154d419d3fa1ed038b44da94e

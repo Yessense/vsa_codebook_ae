@@ -51,10 +51,9 @@ class VSADecoder(pl.LightningModule):
 
         if self.cfg.experiment.scale == 'sqrt':
             self.scale = (cfg.model.latent_dim) ** 0.5
-        elif self.cfg.experiment.scale == 'none':
-            self.scale = 1
         else:
-            raise NotImplemented(f"Wrong scale parameter {cfg.experiment.scale}")
+            self.scale = float(cfg.experiment.scale)
+
         self.softmax = nn.Softmax(dim=1)
 
         if cfg.model.binder == 'fourier':
